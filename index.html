@@ -1,256 +1,454 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>MyShort - 단축 URL 서비스</title>
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;
-         background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
-         min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
-    .container{background:#fff;padding:40px;border-radius:20px;box-shadow:0 20px 40px rgba(0,0,0,.1);
-               max-width:560px;width:100%;text-align:center}
-    .logo{font-size:2.3em;font-weight:800;background:linear-gradient(135deg,#667eea,#764ba2);
-          -webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
-    .subtitle{color:#666;margin-bottom:22px;font-size:1.05em}
-    .url-input{width:100%;padding:15px 20px;border:2px solid #e1e5e9;border-radius:50px;font-size:16px;
-               outline:none;transition:.2s;margin-bottom:12px}
-    .url-input:focus{border-color:#667eea;box-shadow:0 0 0 3px rgba(102,126,234,.12)}
-    .shorten-btn{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:0;padding:14px 28px;
-                 border-radius:50px;font-size:16px;font-weight:700;cursor:pointer;transition:.2s;width:100%}
-    .shorten-btn:hover{transform:translateY(-1.5px);box-shadow:0 10px 20px rgba(102,126,234,.28)}
-    .shorten-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
-    .error{color:#dc3545;margin-top:8px;font-size:14px;min-height:20px}
-    .result{margin-top:22px;padding:18px;background:#f8f9fa;border-radius:15px;display:none}
-    .result.show{display:block;animation:fade .25s ease}
-    @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-    .short-url{background:#fff;padding:12px;border-radius:10px;border:2px solid #e1e5e9;margin:12px 0;
-               font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:15px;
-               word-break:break-all;display:flex;gap:10px;align-items:center;justify-content:space-between}
-    .copy-btn{background:#28a745;color:#fff;border:0;padding:8px 14px;border-radius:8px;cursor:pointer;font-size:14px}
-    .copy-btn:hover{background:#218838}.copy-btn.copied{background:#6c757d}
-    .stats{margin-top:22px;padding:18px;background:#f8f9fa;border-radius:15px;text-align:left}
-    .stats h3{margin-bottom:10px;color:#333}
-    .url-item{background:#fff;padding:10px;border-radius:8px;margin-bottom:10px;border:1px solid #e1e5e9}
-    .url-item .original{font-size:12px;color:#666;word-break:break-all;margin-bottom:5px}
-    .url-item .short{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-weight:700;color:#667eea}
-    .url-item .clicks{font-size:12px;color:#28a745;float:right}
-    .tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-    .tool-btn{background:#2a3040;color:#e6edf3;border:0;border-radius:8px;padding:8px 10px;cursor:pointer;font-size:12px}
-    @media (max-width:480px){
-      .container{padding:22px}.logo{font-size:2em}
-      .short-url{flex-direction:column;align-items:stretch}
-      .copy-btn{width:100%}
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyShort - 단축 URL 서비스</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 2.5em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .url-form {
+            margin-bottom: 30px;
+        }
+
+        .url-input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e1e5e9;
+            border-radius: 50px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
+
+        .url-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .shorten-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .shorten-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .shorten-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .short-url {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #e1e5e9;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            word-break: break-all;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .copy-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 10px;
+            flex-shrink: 0;
+        }
+
+        .copy-btn:hover {
+            background: #218838;
+        }
+
+        .copy-btn.copied {
+            background: #6c757d;
+        }
+
+        .stats {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+        }
+
+        .stats h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .url-list {
+            max-height: 200px;
+            overflow-y: auto;
+            text-align: left;
+        }
+
+        .url-item {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #e1e5e9;
+        }
+
+        .url-item .original {
+            font-size: 12px;
+            color: #666;
+            word-break: break-all;
+            margin-bottom: 5px;
+        }
+
+        .url-item .short {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .url-item .clicks {
+            font-size: 12px;
+            color: #28a745;
+            float: right;
+        }
+
+        .error {
+            color: #dc3545;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .logo {
+                font-size: 2em;
+            }
+            
+            .short-url {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .copy-btn {
+                margin-left: 0;
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="container" id="app">
-    <div class="logo">MyShort</div>
-    <div class="subtitle">긴 URL을 짧고 깔끔하게 만들어보세요</div>
+    <div class="container">
+        <div class="logo">MyShort</div>
+        <div class="subtitle">긴 URL을 짧고 깔끔하게 만들어보세요</div>
+        
+        <div class="url-form">
+            <input type="url" class="url-input" id="urlInput" placeholder="단축할 URL을 입력하세요 (예: https://example.com)">
+            <button class="shorten-btn" id="shortenBtn">단축 URL 만들기</button>
+            <div class="error" id="errorMsg"></div>
+        </div>
 
-    <div class="url-form">
-      <input type="url" class="url-input" id="urlInput" placeholder="단축할 URL을 입력하세요 (예: https://example.com)"/>
-      <button class="shorten-btn" id="shortenBtn">단축 URL 만들기</button>
-      <div class="error" id="errorMsg"></div>
+        <div class="result" id="result">
+            <h3>단축 URL이 생성되었습니다! 🎉</h3>
+            <div class="short-url">
+                <span id="shortUrl"></span>
+                <button class="copy-btn" id="copyBtn">복사</button>
+            </div>
+            <p>이 링크를 클릭하면 원본 URL로 이동합니다</p>
+        </div>
+
+        <div class="stats">
+            <h3>생성된 단축 URL 목록</h3>
+            <div class="url-list" id="urlList">
+                <p style="text-align: center; color: #999;">아직 생성된 단축 URL이 없습니다</p>
+            </div>
+        </div>
     </div>
 
-    <div class="result" id="result">
-      <h3>단축 URL이 생성되었습니다! 🎉</h3>
-      <div class="short-url">
-        <span id="shortUrl"></span>
-        <button class="copy-btn" id="copyBtn">복사</button>
-      </div>
-      <p style="color:#555">이 링크를 클릭하면 원본 URL로 이동합니다.</p>
-    </div>
+    <script>
+        class URLShortener {
+            constructor() {
+                this.urls = this.loadFromStorage();
+                this.baseUrl = window.location.origin + window.location.pathname;
+                this.initEventListeners();
+                this.renderUrlList();
+                this.handleRedirect();
+            }
 
-    <div class="stats">
-      <h3>생성된 단축 URL 목록</h3>
-      <div class="tools">
-        <button class="tool-btn" id="exportBtn">백업(JSON) 내보내기</button>
-        <button class="tool-btn" id="importBtn">백업 불러오기</button>
-        <button class="tool-btn" id="clearBtn">전체 삭제</button>
-      </div>
-      <div id="urlList" style="margin-top:10px">
-        <p style="text-align:center;color:#999">아직 생성된 단축 URL이 없습니다</p>
-      </div>
-    </div>
-  </div>
+            initEventListeners() {
+                document.getElementById('shortenBtn').addEventListener('click', () => this.shortenUrl());
+                document.getElementById('urlInput').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.shortenUrl();
+                });
+                document.getElementById('copyBtn').addEventListener('click', () => this.copyToClipboard());
+            }
 
-  <script>
-    // ---- 유틸 ----
-    const $ = (id)=>document.getElementById(id);
-    const sleep = (ms)=>new Promise(r=>setTimeout(r,ms));
+            generateShortCode(length = 6) {
+                const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                let result = '';
+                for (let i = 0; i < length; i++) {
+                    result += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                return result;
+            }
 
-    // 프로젝트/유저 페이지 모두에서 정상 동작하도록 base URL 계산
-    function getBaseUrl(){
-      // /index.html 이 있으면 제거, 마지막에 슬래시 없음
-      const path = location.pathname.replace(/index\.html$/,'').replace(/\/$/,'');
-      return location.origin + path;
-    }
+            isValidUrl(string) {
+                try {
+                    const url = new URL(string);
+                    return url.protocol === 'http:' || url.protocol === 'https:';
+                } catch (_) {
+                    return false;
+                }
+            }
 
-    function isValidUrl(u){
-      try{ const x = new URL(u); return x.protocol==='http:'||x.protocol==='https:' }catch{ return false }
-    }
+            shortenUrl() {
+                const urlInput = document.getElementById('urlInput');
+                const errorMsg = document.getElementById('errorMsg');
+                const shortenBtn = document.getElementById('shortenBtn');
+                const originalUrl = urlInput.value.trim();
 
-    function randomCode(len=6){
-      const set='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-      let out=''; for (let i=0;i<len;i++) out+=set[Math.floor(Math.random()*set.length)];
-      return out;
-    }
+                // 에러 메시지 초기화
+                errorMsg.textContent = '';
 
-    function truncate(u, n){ return u.length>n ? u.slice(0,n)+'…' : u; }
+                // URL 유효성 검사
+                if (!originalUrl) {
+                    errorMsg.textContent = 'URL을 입력해주세요.';
+                    return;
+                }
 
-    // ---- 앱 ----
-    class URLShortener {
-      constructor(){
-        this.baseUrl = getBaseUrl();
-        this.urls = this.load();
-        this.bind();
-        this.renderList();
-        this.tryRedirect(); // ?s=code or /?s=code
-      }
+                if (!this.isValidUrl(originalUrl)) {
+                    errorMsg.textContent = '올바른 URL 형식이 아닙니다. (예: https://example.com)';
+                    return;
+                }
 
-      bind(){
-        $('shortenBtn').onclick = ()=>this.create();
-        $('urlInput').addEventListener('keydown', e=>{ if(e.key==='Enter') this.create(); });
-        $('copyBtn').onclick = ()=>this.copy();
-        $('exportBtn').onclick = ()=>this.export();
-        $('importBtn').onclick = ()=>this.import();
-        $('clearBtn').onclick = ()=>this.clearAll();
-      }
+                // 버튼 비활성화
+                shortenBtn.disabled = true;
+                shortenBtn.textContent = '생성 중...';
 
-      create(){
-        const original = $('urlInput').value.trim();
-        const err = $('errorMsg'); err.textContent='';
-        if(!original){ err.textContent='URL을 입력해주세요.'; return; }
-        if(!isValidUrl(original)){ err.textContent='올바른 URL 형식이 아닙니다. (예: https://example.com)'; return; }
+                // 짧은 코드 생성 (중복 방지)
+                let shortCode;
+                do {
+                    shortCode = this.generateShortCode();
+                } while (this.urls[shortCode]);
 
-        const btn = $('shortenBtn'); btn.disabled=true; btn.textContent='생성 중…';
+                // URL 정보 저장
+                const urlData = {
+                    original: originalUrl,
+                    short: shortCode,
+                    clicks: 0,
+                    created: new Date().toISOString()
+                };
 
-        // 중복 피해서 코드 생성
-        let code;
-        do{ code = randomCode(); } while (this.urls[code]);
+                this.urls[shortCode] = urlData;
+                this.saveToStorage();
 
-        const info = { original, short: code, clicks: 0, created: new Date().toISOString() };
-        this.urls[code] = info; this.save();
+                // 결과 표시
+                this.showResult(shortCode);
+                this.renderUrlList();
 
-        $('urlInput').value='';
-        this.showResult(code);
-        this.renderList();
+                // 입력 필드 초기화
+                urlInput.value = '';
 
-        btn.disabled=false; btn.textContent='단축 URL 만들기';
-      }
+                // 버튼 활성화
+                shortenBtn.disabled = false;
+                shortenBtn.textContent = '단축 URL 만들기';
+            }
 
-      showResult(code){
-        const short = `${this.baseUrl}?s=${encodeURIComponent(code)}`;
-        $('shortUrl').textContent = short;
-        $('result').classList.add('show');
-        $('result').scrollIntoView({ behavior:'smooth', block:'nearest' });
-      }
+            showResult(shortCode) {
+                const result = document.getElementById('result');
+                const shortUrl = document.getElementById('shortUrl');
+                const fullShortUrl = `${this.baseUrl}?s=${shortCode}`;
+                
+                shortUrl.textContent = fullShortUrl;
+                result.classList.add('show');
 
-      async copy(){
-        const t = $('shortUrl').textContent;
-        const b = $('copyBtn');
-        try { await navigator.clipboard.writeText(t); }
-        catch {
-          const ta=document.createElement('textarea'); ta.value=t; document.body.appendChild(ta);
-          ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+                // 스크롤 효과
+                result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+
+            async copyToClipboard() {
+                const shortUrl = document.getElementById('shortUrl').textContent;
+                const copyBtn = document.getElementById('copyBtn');
+                
+                try {
+                    await navigator.clipboard.writeText(shortUrl);
+                    copyBtn.textContent = '복사됨!';
+                    copyBtn.classList.add('copied');
+                    
+                    setTimeout(() => {
+                        copyBtn.textContent = '복사';
+                        copyBtn.classList.remove('copied');
+                    }, 2000);
+                } catch (err) {
+                    // 클립보드 API가 지원되지 않는 경우
+                    const textArea = document.createElement('textarea');
+                    textArea.value = shortUrl;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    
+                    copyBtn.textContent = '복사됨!';
+                    setTimeout(() => {
+                        copyBtn.textContent = '복사';
+                    }, 2000);
+                }
+            }
+
+            renderUrlList() {
+                const urlList = document.getElementById('urlList');
+                const urlEntries = Object.entries(this.urls)
+                    .sort(([,a], [,b]) => new Date(b.created) - new Date(a.created))
+                    .slice(0, 10); // 최신 10개만 표시
+
+                if (urlEntries.length === 0) {
+                    urlList.innerHTML = '<p style="text-align: center; color: #999;">아직 생성된 단축 URL이 없습니다</p>';
+                    return;
+                }
+
+                urlList.innerHTML = urlEntries.map(([shortCode, data]) => `
+                    <div class="url-item">
+                        <div class="clicks">${data.clicks} 클릭</div>
+                        <div class="original">${this.truncateUrl(data.original, 50)}</div>
+                        <div class="short">
+                            <a href="?s=${shortCode}" target="_blank" style="text-decoration: none; color: inherit;">
+                                ${this.baseUrl}?s=${shortCode}
+                            </a>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            truncateUrl(url, maxLength) {
+                return url.length > maxLength ? url.substring(0, maxLength) + '...' : url;
+            }
+
+            handleRedirect() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const shortCode = urlParams.get('s');
+                
+                if (shortCode && this.urls[shortCode]) {
+                    // 클릭 수 증가
+                    this.urls[shortCode].clicks++;
+                    this.saveToStorage();
+                    
+                    // 원본 URL로 리다이렉트
+                    window.location.href = this.urls[shortCode].original;
+                    return;
+                }
+                
+                if (shortCode) {
+                    // 존재하지 않는 단축 URL
+                    document.body.innerHTML = `
+                        <div style="text-align: center; margin-top: 100px; font-family: sans-serif;">
+                            <h1 style="color: #dc3545;">404 - 페이지를 찾을 수 없습니다</h1>
+                            <p style="margin: 20px 0;">요청하신 단축 URL이 존재하지 않거나 만료되었습니다.</p>
+                            <a href="${this.baseUrl}" style="color: #667eea; text-decoration: none; font-weight: bold;">홈페이지로 돌아가기</a>
+                        </div>
+                    `;
+                }
+            }
+
+            saveToStorage() {
+                localStorage.setItem('shortUrls', JSON.stringify(this.urls));
+            }
+
+            loadFromStorage() {
+                try {
+                    return JSON.parse(localStorage.getItem('shortUrls')) || {};
+                } catch (e) {
+                    return {};
+                }
+            }
         }
-        b.textContent='복사됨!'; b.classList.add('copied');
-        await sleep(1600); b.textContent='복사'; b.classList.remove('copied');
-      }
 
-      renderList(){
-        const box = $('urlList');
-        const entries = Object.entries(this.urls)
-          .sort(([,a],[,b])=> new Date(b.created)-new Date(a.created))
-          .slice(0, 15);
-
-        if(entries.length===0){
-          box.innerHTML = '<p style="text-align:center;color:#999">아직 생성된 단축 URL이 없습니다</p>';
-          return;
-        }
-        box.innerHTML = entries.map(([code, data])=>{
-          const short = `${this.baseUrl}?s=${encodeURIComponent(code)}`;
-          return `
-            <div class="url-item">
-              <div class="clicks">${data.clicks} 클릭</div>
-              <div class="original" title="${data.original}">${truncate(data.original, 70)}</div>
-              <div class="short"><a href="?s=${encodeURIComponent(code)}" target="_blank" style="text-decoration:none;color:inherit">${short}</a></div>
-            </div>`;
-        }).join('');
-      }
-
-      tryRedirect(){
-        // ?s=CODE 지원
-        const params = new URLSearchParams(location.search);
-        const code = params.get('s');
-        if(!code) return;
-
-        const info = this.urls[code];
-        if(!info){
-          // 존재하지 않음
-          document.body.innerHTML = `
-            <div class="redirect-page" style="text-align:center;margin-top:100px">
-              <div class="redirect-404" style="color:#dc3545;font-size:32px;margin-bottom:12px">404</div>
-              <h1>페이지를 찾을 수 없습니다</h1>
-              <p style="margin:16px 0">요청하신 단축 URL "<b>${code}</b>"이 존재하지 않거나 이 브라우저에 저장되지 않았습니다.</p>
-              <p style="color:#999">홈에서 먼저 단축 URL을 생성해 주세요.</p>
-              <a class="home-btn" href="${this.baseUrl}" style="color:#667eea;text-decoration:none;font-weight:700;font-size:18px;padding:10px 20px;border:2px solid #667eea;border-radius:6px;display:inline-block;margin-top:16px">홈으로</a>
-            </div>`;
-          return;
-        }
-
-        // 카운트 증가 & 저장
-        info.clicks++; this.save();
-
-        const target = info.original;
-        document.body.innerHTML = `
-          <div class="redirect-page" style="text-align:center;margin-top:100px;font-family:sans-serif">
-            <div class="redirect-loading" style="color:#28a745;font-size:24px;margin-bottom:10px">🚀 리다이렉트 중…</div>
-            <p>잠시만 기다려주세요.</p>
-            <div class="redirect-url" style="color:#666;font-size:14px;word-break:break-all;margin:10px 0">대상: ${target}</div>
-            <p style="color:#999;font-size:12px;margin-top:14px">3초 후 자동 이동합니다.</p>
-          </div>`;
-        setTimeout(()=> location.href = target, 3000);
-      }
-
-      export(){
-        const blob = new Blob([JSON.stringify(this.urls,null,2)], {type:'application/json'});
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob); a.download = 'myshort-backup.json'; a.click();
-        URL.revokeObjectURL(a.href);
-      }
-
-      import(){
-        const inp = document.createElement('input'); inp.type='file'; inp.accept='application/json';
-        inp.onchange = () => {
-          const f = inp.files?.[0]; if(!f) return;
-          const rd = new FileReader();
-          rd.onload = () => {
-            try {
-              const data = JSON.parse(String(rd.result));
-              if (typeof data !== 'object' || Array.isArray(data)) throw new Error();
-              this.urls = data; this.save(); this.renderList(); alert('불러오기 완료!');
-            } catch { alert('JSON 형식이 올바르지 않아요.'); }
-          };
-          rd.readAsText(f);
-        };
-        inp.click();
-      }
-
-      clearAll(){
-        if(!confirm('모든 단축 URL을 삭제할까요?')) return;
-        this.urls = {}; this.save(); this.renderList(); $('result').classList.remove('show');
-      }
-
-      save(){ try{ localStorage.setItem('shortUrls', JSON.stringify(this.urls)); }catch(e){ console.error(e); } }
-      load(){ try{ const s=localStorage.getItem('shortUrls'); return s?JSON.parse(s):{} }catch{ return {} } }
-    }
-
-    document.addEventListener('DOMContentLoaded', ()=> new URLShortener());
-  </script>
+        // 페이지 로드시 URL 단축기 초기화
+        document.addEventListener('DOMContentLoaded', () => {
+            new URLShortener();
+        });
+    </script>
 </body>
 </html>
