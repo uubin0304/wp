@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MyShort - 단축 URL 서비스</title>
+    <title>BlogShort - 워드프레스 유입용 단축 URL</title>
     <style>
         * {
             margin: 0;
@@ -26,7 +26,7 @@
             padding: 40px;
             border-radius: 20px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            max-width: 500px;
+            max-width: 600px;
             width: 100%;
             text-align: center;
         }
@@ -64,6 +64,21 @@
         .url-input:focus {
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .title-input {
+            width: 100%;
+            padding: 10px 20px;
+            border: 1px solid #e1e5e9;
+            border-radius: 25px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
+
+        .title-input:focus {
+            border-color: #667eea;
         }
 
         .shorten-btn {
@@ -161,36 +176,51 @@
         }
 
         .url-list {
-            max-height: 200px;
+            max-height: 300px;
             overflow-y: auto;
             text-align: left;
         }
 
         .url-item {
             background: white;
-            padding: 10px;
+            padding: 15px;
             border-radius: 8px;
             margin-bottom: 10px;
             border: 1px solid #e1e5e9;
+        }
+
+        .url-item .title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 14px;
         }
 
         .url-item .original {
             font-size: 12px;
             color: #666;
             word-break: break-all;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
         }
 
         .url-item .short {
             font-family: 'Courier New', monospace;
             font-weight: bold;
             color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .url-item .stats-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #999;
         }
 
         .url-item .clicks {
-            font-size: 12px;
             color: #28a745;
-            float: right;
+            font-weight: bold;
         }
 
         .error {
@@ -199,8 +229,94 @@
             font-size: 14px;
         }
 
+        .redirect-page {
+            text-align: center;
+            background: white;
+            padding: 60px 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .redirect-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .redirect-title {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .redirect-message {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .redirect-url {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #555;
+            word-break: break-all;
+            margin-bottom: 30px;
+        }
+
+        .countdown {
+            font-size: 20px;
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .manual-link {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .manual-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .home-btn {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+            margin-top: 20px;
+            display: inline-block;
+        }
+
+        .home-btn:hover {
+            text-decoration: underline;
+        }
+
+        .error-page {
+            text-align: center;
+            color: #dc3545;
+        }
+
+        .error-icon {
+            font-size: 72px;
+            margin-bottom: 20px;
+        }
+
         @media (max-width: 480px) {
-            .container {
+            .container, .redirect-page {
                 padding: 20px;
             }
             
@@ -221,12 +337,13 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="logo">MyShort</div>
-        <div class="subtitle">긴 URL을 짧고 깔끔하게 만들어보세요</div>
+    <div class="container" id="mainContainer">
+        <div class="logo">BlogShort</div>
+        <div class="subtitle">워드프레스 블로그 유입을 위한 단축 URL 생성기</div>
         
         <div class="url-form">
-            <input type="url" class="url-input" id="urlInput" placeholder="단축할 URL을 입력하세요 (예: https://example.com)">
+            <input type="text" class="title-input" id="titleInput" placeholder="글 제목 또는 메모 (선택사항)">
+            <input type="url" class="url-input" id="urlInput" placeholder="워드프레스 글 URL을 입력하세요 (예: https://yourblog.com/post)">
             <button class="shorten-btn" id="shortenBtn">단축 URL 만들기</button>
             <div class="error" id="errorMsg"></div>
         </div>
@@ -237,11 +354,11 @@
                 <span id="shortUrl"></span>
                 <button class="copy-btn" id="copyBtn">복사</button>
             </div>
-            <p>이 링크를 클릭하면 원본 URL로 이동합니다</p>
+            <p>이 링크를 SNS, 메시지 등에 공유하여 블로그 유입을 늘려보세요!</p>
         </div>
 
         <div class="stats">
-            <h3>생성된 단축 URL 목록</h3>
+            <h3>생성된 단축 URL 목록 (최신순)</h3>
             <div class="url-list" id="urlList">
                 <p style="text-align: center; color: #999;">아직 생성된 단축 URL이 없습니다</p>
             </div>
@@ -249,10 +366,10 @@
     </div>
 
     <script>
-        class URLShortener {
+        class BlogURLShortener {
             constructor() {
                 this.urls = this.loadFromStorage();
-                this.baseUrl = window.location.origin + window.location.pathname;
+                this.baseUrl = window.location.origin + window.location.pathname.replace('/index.html', '');
                 this.initEventListeners();
                 this.renderUrlList();
                 this.handleRedirect();
@@ -261,6 +378,9 @@
             initEventListeners() {
                 document.getElementById('shortenBtn').addEventListener('click', () => this.shortenUrl());
                 document.getElementById('urlInput').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.shortenUrl();
+                });
+                document.getElementById('titleInput').addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') this.shortenUrl();
                 });
                 document.getElementById('copyBtn').addEventListener('click', () => this.copyToClipboard());
@@ -286,21 +406,23 @@
 
             shortenUrl() {
                 const urlInput = document.getElementById('urlInput');
+                const titleInput = document.getElementById('titleInput');
                 const errorMsg = document.getElementById('errorMsg');
                 const shortenBtn = document.getElementById('shortenBtn');
                 const originalUrl = urlInput.value.trim();
+                const title = titleInput.value.trim() || '제목 없음';
 
                 // 에러 메시지 초기화
                 errorMsg.textContent = '';
 
                 // URL 유효성 검사
                 if (!originalUrl) {
-                    errorMsg.textContent = 'URL을 입력해주세요.';
+                    errorMsg.textContent = '워드프레스 글 URL을 입력해주세요.';
                     return;
                 }
 
                 if (!this.isValidUrl(originalUrl)) {
-                    errorMsg.textContent = '올바른 URL 형식이 아닙니다. (예: https://example.com)';
+                    errorMsg.textContent = '올바른 URL 형식이 아닙니다. (예: https://yourblog.com/post)';
                     return;
                 }
 
@@ -317,9 +439,11 @@
                 // URL 정보 저장
                 const urlData = {
                     original: originalUrl,
+                    title: title,
                     short: shortCode,
                     clicks: 0,
-                    created: new Date().toISOString()
+                    created: new Date().toISOString(),
+                    lastClicked: null
                 };
 
                 this.urls[shortCode] = urlData;
@@ -331,6 +455,7 @@
 
                 // 입력 필드 초기화
                 urlInput.value = '';
+                titleInput.value = '';
 
                 // 버튼 활성화
                 shortenBtn.disabled = false;
@@ -382,24 +507,37 @@
                 const urlList = document.getElementById('urlList');
                 const urlEntries = Object.entries(this.urls)
                     .sort(([,a], [,b]) => new Date(b.created) - new Date(a.created))
-                    .slice(0, 10); // 최신 10개만 표시
+                    .slice(0, 15); // 최신 15개만 표시
 
                 if (urlEntries.length === 0) {
                     urlList.innerHTML = '<p style="text-align: center; color: #999;">아직 생성된 단축 URL이 없습니다</p>';
                     return;
                 }
 
-                urlList.innerHTML = urlEntries.map(([shortCode, data]) => `
-                    <div class="url-item">
-                        <div class="clicks">${data.clicks} 클릭</div>
-                        <div class="original">${this.truncateUrl(data.original, 50)}</div>
-                        <div class="short">
-                            <a href="?s=${shortCode}" target="_blank" style="text-decoration: none; color: inherit;">
-                                ${this.baseUrl}?s=${shortCode}
-                            </a>
+                urlList.innerHTML = urlEntries.map(([shortCode, data]) => {
+                    const createdDate = new Date(data.created).toLocaleDateString('ko-KR');
+                    const lastClicked = data.lastClicked ? 
+                        new Date(data.lastClicked).toLocaleDateString('ko-KR') : '아직 클릭 없음';
+                    
+                    return `
+                        <div class="url-item">
+                            <div class="title">📝 ${data.title}</div>
+                            <div class="original">원본: ${this.truncateUrl(data.original, 60)}</div>
+                            <div class="short">
+                                <a href="?s=${shortCode}" target="_blank" style="text-decoration: none; color: inherit;">
+                                    ${this.baseUrl}?s=${shortCode}
+                                </a>
+                            </div>
+                            <div class="stats-row">
+                                <span>생성일: ${createdDate}</span>
+                                <span class="clicks">${data.clicks} 클릭</span>
+                            </div>
+                            <div class="stats-row">
+                                <span style="font-size: 11px;">마지막 클릭: ${lastClicked}</span>
+                            </div>
                         </div>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
             }
 
             truncateUrl(url, maxLength) {
@@ -411,43 +549,94 @@
                 const shortCode = urlParams.get('s');
                 
                 if (shortCode && this.urls[shortCode]) {
-                    // 클릭 수 증가
+                    const urlData = this.urls[shortCode];
+                    
+                    // 클릭 수 증가 및 마지막 클릭 시간 업데이트
                     this.urls[shortCode].clicks++;
+                    this.urls[shortCode].lastClicked = new Date().toISOString();
                     this.saveToStorage();
                     
-                    // 원본 URL로 리다이렉트
-                    window.location.href = this.urls[shortCode].original;
+                    // 리다이렉트 페이지 표시
+                    document.body.innerHTML = `
+                        <div class="redirect-page">
+                            <div class="redirect-icon">🚀</div>
+                            <div class="redirect-title">블로그로 이동 중...</div>
+                            <div class="redirect-message">
+                                "${urlData.title}" 글로 이동합니다.<br>
+                                잠시만 기다려주세요.
+                            </div>
+                            <div class="redirect-url">${urlData.original}</div>
+                            <div class="countdown" id="countdown">3초 후 자동 이동</div>
+                            <a href="${urlData.original}" class="manual-link" id="manualLink">
+                                지금 바로 이동하기
+                            </a>
+                            <br>
+                            <a href="${this.baseUrl}" class="home-btn">
+                                홈페이지로 돌아가기
+                            </a>
+                        </div>
+                    `;
+                    
+                    // 카운트다운 및 자동 리다이렉트
+                    let countdown = 3;
+                    const countdownElement = document.getElementById('countdown');
+                    
+                    const timer = setInterval(() => {
+                        countdown--;
+                        if (countdown > 0) {
+                            countdownElement.textContent = `${countdown}초 후 자동 이동`;
+                        } else {
+                            clearInterval(timer);
+                            window.location.href = urlData.original;
+                        }
+                    }, 1000);
+                    
                     return;
                 }
                 
                 if (shortCode) {
                     // 존재하지 않는 단축 URL
                     document.body.innerHTML = `
-                        <div style="text-align: center; margin-top: 100px; font-family: sans-serif;">
-                            <h1 style="color: #dc3545;">404 - 페이지를 찾을 수 없습니다</h1>
-                            <p style="margin: 20px 0;">요청하신 단축 URL이 존재하지 않거나 만료되었습니다.</p>
-                            <a href="${this.baseUrl}" style="color: #667eea; text-decoration: none; font-weight: bold;">홈페이지로 돌아가기</a>
+                        <div class="redirect-page error-page">
+                            <div class="error-icon">❌</div>
+                            <h1>페이지를 찾을 수 없습니다</h1>
+                            <p style="margin: 20px 0;">
+                                요청하신 단축 URL "${shortCode}"이 존재하지 않거나<br>
+                                만료되었을 수 있습니다.
+                            </p>
+                            <p style="color: #999; margin-bottom: 30px;">
+                                올바른 단축 URL인지 다시 확인해보세요.
+                            </p>
+                            <a href="${this.baseUrl}" class="manual-link">
+                                홈페이지로 돌아가기
+                            </a>
                         </div>
                     `;
                 }
             }
 
             saveToStorage() {
-                localStorage.setItem('shortUrls', JSON.stringify(this.urls));
+                try {
+                    localStorage.setItem('blogShortUrls', JSON.stringify(this.urls));
+                } catch (e) {
+                    console.error('저장 실패:', e);
+                }
             }
 
             loadFromStorage() {
                 try {
-                    return JSON.parse(localStorage.getItem('shortUrls')) || {};
+                    const stored = localStorage.getItem('blogShortUrls');
+                    return stored ? JSON.parse(stored) : {};
                 } catch (e) {
+                    console.error('로드 실패:', e);
                     return {};
                 }
             }
         }
 
-        // 페이지 로드시 URL 단축기 초기화
+        // 페이지 로드시 초기화
         document.addEventListener('DOMContentLoaded', () => {
-            new URLShortener();
+            new BlogURLShortener();
         });
     </script>
 </body>
